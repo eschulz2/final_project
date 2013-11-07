@@ -3,7 +3,7 @@
   <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-    <title>Transit layer</title>
+    <title>Custom controls</title>
     <style>
       html, body, #map-canvas {
         height: 100%;
@@ -13,52 +13,115 @@
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
     <script>
-function initializeTransit() {
-  var myLatlng = new google.maps.LatLng(41.889911, -87.637657);
-  var mapOptions = {
-    zoom: 13,
-    center: myLatlng,
-    mapTypeId: google.maps.MapTypeId.ROADMAP
-  }
+var map;
+var chicago = new google.maps.LatLng(41.890033, -87.6400523);
 
-  var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+/**
+ * The HomeControl adds a control to the map that simply
+ * returns the user to Chicago. This constructor takes
+ * the control DIV as an argument.
+ * @constructor
+ */
+function HomeControl(controlDiv, map) {
 
-  var transitLayer = new google.maps.TransitLayer();
-  transitLayer.setMap(map);
+  // Set CSS styles for the DIV containing the control
+  // Setting padding to 5 px will offset the control
+  // from the edge of the map
+  controlDiv.style.padding = '5px';
+
+  // Set CSS for the control border
+  var controlUI = document.createElement('div');
+  controlUI.style.backgroundColor = 'white';
+  controlUI.style.borderStyle = 'solid';
+  controlUI.style.borderWidth = '2px';
+  controlUI.style.cursor = 'pointer';
+  controlUI.style.textAlign = 'center';
+  controlUI.title = 'Click to set the map to Home';
+  controlDiv.appendChild(controlUI);
+
+  // Set CSS for the control interior
+  var controlText = document.createElement('div');
+  controlText.style.fontFamily = 'Arial,sans-serif';
+  controlText.style.fontSize = '12px';
+  controlText.style.paddingLeft = '4px';
+  controlText.style.paddingRight = '4px';
+  controlText.innerHTML = '<b>Transit</b>';
+  controlUI.appendChild(controlText);
+
+  // Setup the click event listeners: simply set the map to
+  // Chicago
+  google.maps.event.addDomListener(controlUI, 'click', function() {
+    //call transit intialize
+    var transitLayer = new google.maps.TransitLayer();
+    transitLayer.setMap(map);
+  });
+
 }
 
-function initializeTraffic() {
-  var myLatlng = new google.maps.LatLng(41.889911, -87.637657);
-  var mapOptions = {
-    zoom: 13,
-    center: myLatlng,
-    mapTypeId: google.maps.MapTypeId.ROADMAP
-  }
+function TrafficControl(controlDiv, map) {
 
-  var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+  // Set CSS styles for the DIV containing the control
+  // Setting padding to 5 px will offset the control
+  // from the edge of the map
+  controlDiv.style.padding = '5px';
 
-  var trafficLayer = new google.maps.TrafficLayer();
-  trafficLayer.setMap(map);
+  // Set CSS for the control border
+  var controlUI = document.createElement('div');
+  controlUI.style.backgroundColor = 'white';
+  controlUI.style.borderStyle = 'solid';
+  controlUI.style.borderWidth = '2px';
+  controlUI.style.cursor = 'pointer';
+  controlUI.style.textAlign = 'center';
+  controlUI.title = 'Click to set the map to Home';
+  controlDiv.appendChild(controlUI);
+
+  // Set CSS for the control interior
+  var controlText = document.createElement('div');
+  controlText.style.fontFamily = 'Arial,sans-serif';
+  controlText.style.fontSize = '12px';
+  controlText.style.paddingLeft = '4px';
+  controlText.style.paddingRight = '4px';
+  controlText.innerHTML = '<b>Traffic</b>';
+  controlUI.appendChild(controlText);
+
+  // Setup the click event listeners: simply set the map to
+  // Chicago
+  google.maps.event.addDomListener(controlUI, 'click', function() {
+    //call transit intialize
+    var trafficLayer = new google.maps.TrafficLayer();
+    trafficLayer.setMap(map);
+  });
+
 }
 
 function initialize() {
-        var mapOptions = {
-          center: new google.maps.LatLng(41.889911, -87.637657),
-          zoom: 13,
-          mapTypeId: google.maps.MapTypeId.ROADMAP
-        };
-        var map = new google.maps.Map(document.getElementById("map-canvas"),
-            mapOptions);
-      }
-      google.maps.event.addDomListener(window, 'load', initialize);
+  var mapDiv = document.getElementById('map-canvas');
+  var mapOptions = {
+    zoom: 15,
+    center: chicago,
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+  }
+  map = new google.maps.Map(mapDiv, mapOptions);
+
+  // Create the DIV to hold the control and
+  // call the HomeControl() constructor passing
+  // in this DIV.
+  var homeControlDiv = document.createElement('div');
+  var homeControl = new HomeControl(homeControlDiv, map);
+  var trafficControlDiv = document.createElement('div');
+  var trafficControl = new TrafficControl(trafficControlDiv, map);
+
+  homeControlDiv.index = 1;
+  trafficControlDiv.index = 2;
+  map.controls[google.maps.ControlPosition.TOP_RIGHT].push(homeControlDiv);
+  map.controls[google.maps.ControlPosition.TOP_RIGHT].push(trafficControlDiv);
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
 
     </script>
   </head>
   <body>
     <div id="map-canvas"></div>
-    <div id="overlay">
-      <button id="traffic">Traffic</button>
-      <button id="transit">Transit</button>
-    </div>
   </body>
 </html>
